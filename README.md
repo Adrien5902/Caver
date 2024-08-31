@@ -5,9 +5,9 @@ ___
 
 <h6 align="center">
 
-![GitHub License](https://img.shields.io/github/license/Adrien5902/caver?color=red&style=for-the-badge)
+![GitHub License](https://img.shields.io/github/license/Adrien5902/Caver?color=red&style=for-the-badge)
 ![Static Badge](https://img.shields.io/badge/Project%20Status-In%20developpment...-s?style=for-the-badge&color=orange)
-![GitHub top language](https://img.shields.io/github/languages/top/Adrien5902/caver?style=for-the-badge&labelColor=gray&color=orange)
+![GitHub top language](https://img.shields.io/github/languages/top/Adrien5902/Caver?style=for-the-badge&labelColor=gray&color=orange)
 
 </h6>
 
