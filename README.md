@@ -1,6 +1,6 @@
 ### ![Caver](caver_banner.png)
 ___
-#### <p align="center">The file explorer that searches through the deepest corners of your system</p>
+#### <p align="center">🔍 The file explorer that searches through the deepest corners of your drive... 📂</p>
 ___
 
 <h6 align="center">
