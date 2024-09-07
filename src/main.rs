@@ -1,4 +1,5 @@
 #![feature(extract_if)]
+#![feature(iter_advance_by)]
 
 pub mod disk;
 pub mod error;
@@ -8,7 +9,6 @@ pub mod search;
 use std::{env, time::Instant};
 
 use file::index::FileIndex;
-use search::{SearchJoin, SearchJoinOperation, SearchJoinParam, SearchParams, SearchValue};
 
 fn main() {
     let args = env::args().collect::<Vec<_>>();
@@ -22,16 +22,7 @@ fn main() {
         println!("fi fetch time : {:?}", Instant::now() - fi_fetch_start);
 
         let search_start = Instant::now();
-        let results = fi.advanced_search(SearchParams {
-            contains: Some(SearchJoinParam::Value(SearchValue {
-                s: "main.rs".to_string(),
-                invert: false,
-            })),
-            content_contains: Some(SearchJoinParam::Value(SearchValue {
-                s: "args".to_string(),
-                invert: false,
-            })),
-        });
+        let results = fi.search_str("path<minecraft assets>");
 
         println!("search time : {:?}", Instant::now() - search_start);
         println!("results : {:?}", results.len());

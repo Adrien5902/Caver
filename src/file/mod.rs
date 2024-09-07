@@ -16,6 +16,28 @@ impl File {
     }
 }
 
+pub trait IsValidWindowsFileName {
+    fn is_valid_windows_file_name(&self) -> bool;
+}
+
+impl IsValidWindowsFileName for char {
+    fn is_valid_windows_file_name(&self) -> bool {
+        match self {
+            '\\' | '/' | ':' | '*' | '?' | '"' | '<' | '>' | '|' => false,
+            _ => true,
+        }
+    }
+}
+
+impl IsValidWindowsFileName for str {
+    fn is_valid_windows_file_name(&self) -> bool {
+        self.chars()
+            .map(|c| c.is_valid_windows_file_name())
+            .reduce(|a, b| a && b)
+            .unwrap_or_default() // empty is false
+    }
+}
+
 pub struct FileIterator<'a> {
     path: PathBuf,
     stack: Vec<std::slice::Iter<'a, File>>,
@@ -23,8 +45,10 @@ pub struct FileIterator<'a> {
 
 impl<'a> FileIterator<'a> {
     fn new(root: &'a File) -> Self {
+        let mut path = PathBuf::with_capacity(512);
+        path.push(&root.name);
         Self {
-            path: PathBuf::from(&root.name),
+            path,
             stack: vec![root.children.iter()],
         }
     }

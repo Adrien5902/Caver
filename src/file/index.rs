@@ -4,6 +4,7 @@ use std::{
     fs,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
+    time::Instant,
 };
 
 use ntfs_reader::{
@@ -83,12 +84,12 @@ impl FileIndex {
 
                             let parent_index = file_name.parent();
                             if parent_index == ROOT_RECORD {
-                                roots.push((index - FIRST_NORMAL_RECORD) as usize)
+                                roots.push((index) as usize)
                             } else {
                                 children_refs
-                                    .entry((parent_index - FIRST_NORMAL_RECORD) as usize)
+                                    .entry((parent_index) as usize)
                                     .or_insert(Vec::new())
-                                    .push((index - FIRST_NORMAL_RECORD) as usize)
+                                    .push((index) as usize)
                             }
 
                             Some(file_name.to_string())
@@ -101,7 +102,9 @@ impl FileIndex {
                         children_cache: &HashMap<usize, Vec<usize>>,
                     ) -> File {
                         let mut file = File {
-                            name: old_files[index].clone().unwrap(),
+                            name: old_files[index - FIRST_NORMAL_RECORD as usize]
+                                .clone()
+                                .unwrap(),
                             children: vec![],
                         };
 
@@ -147,17 +150,35 @@ impl FileIndex {
         bincode::deserialize(&data).into_caver_result()
     }
 
-    pub fn advanced_search(&self, params: SearchParams) -> Vec<(&File, PathBuf)> {
+    pub fn search(&self, params: SearchParams) -> Vec<(String, PathBuf)> {
         let res = self
             .disks
             .par_iter()
             .flat_map(|disk| {
                 disk.iter()
-                    .filter_map(|data| params.process(&data).map(|_| data))
+                    .filter_map(|data| {
+                        params
+                            .process(&data)
+                            .then_some((data.0.name.clone(), data.1))
+                    })
                     .collect::<Vec<_>>()
             })
             .collect();
 
+        res
+    }
+
+    pub fn search_str(&self, s: &str) -> Vec<(String, PathBuf)> {
+        let params_parse_start = Instant::now();
+        let params = SearchParams::from_str(s);
+        println!(
+            "params parse time {:?}",
+            Instant::now() - params_parse_start
+        );
+
+        let search_start = Instant::now();
+        let res = self.search(params);
+        println!("search time {:?}", Instant::now() - search_start);
         res
     }
 }
